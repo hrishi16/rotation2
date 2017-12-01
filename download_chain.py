@@ -39,8 +39,8 @@ def get_chain( nid ):
         print( '[%d/%d] Downloading %s' % (i, len(idsToDownload), _id))
         res = query_pimadb.query_db( _id, [0, 4, 5] )
         entry = { }
-        for z, x, y in res:
-            entry[z] = float(x)/float(y)
+        for r in filter( lambda x: len(x) == 3, res):
+            entry[r[0]] = float(r[1])/float(r[2])
         data[ _id ] = entry
 
     outfile = '%s_chain.pickle' % nid 

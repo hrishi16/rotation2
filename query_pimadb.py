@@ -36,7 +36,10 @@ def query_db( q, idx ):
     for r in rows:
         x = r
         if len( idx ) > 0:
-            x = [ r[i] for i in idx ]
+            try:
+                x = [ r[i] for i in idx ]
+            except IndexError as e:
+                print( '[WARN] (INDEX ERROR) ignoring line %s' % r )
         res.append( x )
     return res
 

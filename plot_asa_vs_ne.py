@@ -58,10 +58,13 @@ def process( f, d, data ):
 
 def main( ):
     data = None
+
     with open( sys.argv[1], 'rb' ) as f:
         data = pickle.load( f )
 
-    files = glob.glob( './toplot/*' )
+    psaDir = sys.argv[2]
+    files = glob.glob( os.path.join( psaDir, '*') )
+
     plt.figure( )
     for f in files:
         d = pd.read_csv( f, sep = '\t' )
@@ -78,7 +81,7 @@ def main( ):
 
     outfile = '%s.png' % sys.argv[1] 
     plt.tight_layout( )
-    plt.show( )
+    #plt.show( )
     plt.savefig( outfile )
     print( 'Plot saved to %s' % outfile )
     print( 'All done' )
