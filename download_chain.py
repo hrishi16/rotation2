@@ -18,7 +18,12 @@ from bs4 import BeautifulSoup
 import query_pimadb
 import pickle
 
+tempdir = '_temp' 
+if not os.path.isdir( tempdir ):
+    os.makedirs( tempdir )
+
 def get_chain( nid ):
+
     print( '[INFO] Getting ids for chain %s' % nid )
     url = 'http://caps.ncbs.res.in/cgi-bin/pimadb/show_list_by_chain_number.py?num_chains=%s' % nid 
     html = urllib2.urlopen( url ).read( )
@@ -36,9 +41,21 @@ def get_chain( nid ):
 
     data = dict( )
     for i, _id in enumerate( idsToDownload ):
-        print( '[%d/%d] Downloading %s' % (i, len(idsToDownload), _id))
-        res = query_pimadb.query_db( _id, [0, 4, 5] )
+        entryFile = os.path.join( tempdir, '%s_%s.pickle' % (nid,_id) )
+        if not os.path.exists( entryFile ):
+            print( '[%d/%d] Downloading %s' % (i, len(idsToDownload), _id))
+            res = query_pimadb.query_db( _id, [0, 4, 5] )
+
+            with open( entryFile, 'wb' ) as f:
+                print( '   Saving to %s' % entryFile )
+                pickle.dump( res, f )
+        else:
+            print( '[%d/%d] already downloaded %s' % (i, len(idsToDownload), _id))
+
         entry = { }
+        with open( entryFile, 'rb' ) as f:
+            res = pickle.load( f )
+
         for r in filter( lambda x: len(x) == 3, res):
             entry[r[0]] = float(r[1])/float(r[2])
         data[ _id ] = entry
